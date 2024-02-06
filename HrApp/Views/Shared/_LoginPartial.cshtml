@@ -1,0 +1,13 @@
+﻿@using Microsoft.AspNetCore.Identity
+@inject SignInManager<IdentityUser> SignInManager
+@inject UserManager<IdentityUser> UserManager
+
+@if (SignInManager.IsSignedIn(User))
+{
+    <a class="btn btn-block link-light border-danger m-1" asp-controller="Account" asp-action="Logout">Logout</a>
+}
+else
+{
+    <a class="btn btn-block link-light border-danger m-1" asp-controller="Account" asp-action="Register">Register</a>
+    <a class="btn btn-block link-light border-danger m-1" asp-controller="Account" asp-action="Login">Login</a>
+}

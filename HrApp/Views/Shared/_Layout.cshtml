@@ -1,0 +1,40 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PXL Hr App - @ViewData["Title"]</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/lib/font-awesome/css/all.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/HrApp.styles.css" asp-append-version="true" />
+</head>
+<body>
+    <header>
+        <div class="d-flex bg-black text-white p-2">
+            <span class="navbar-brand flex-grow-1 ml-2">
+                <a class="btn btn-block link-light border-white" asp-controller="Home" asp-action="Index">HrApp</a>
+                <a class="btn btn-block link-light border-white" asp-controller="Employee" asp-action="Index">Employees</a>
+            </span>
+            <span>
+                <partial name="_LoginPartial" />
+            </span>
+        </div>
+    </header>
+    <div class="container">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="border-top footer text-muted">
+        <div class="container">
+            PXL HR &copy; 2023 - 2024
+        </div>
+    </footer>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

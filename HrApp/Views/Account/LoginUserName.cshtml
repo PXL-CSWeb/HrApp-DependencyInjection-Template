@@ -1,0 +1,28 @@
+﻿@model HrApp.ViewModels.LoginUserNameViewModel
+@{
+    ViewData["Title"] = "Login";
+}
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="LoginUserName">
+            <div asp-validation-summary="All" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="UserName" class="control-label"></label>
+                <input asp-for="UserName" class="form-control" />
+                <span asp-validation-for="UserName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Password" class="control-label"></label>
+                <input asp-for="Password" class="form-control" />
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Login" class="btn btn-primary m-2" />
+            </div>
+        </form>
+    </div>
+</div>
+<br />
+<div>
+    <a asp-action="Register">Registreer een nieuwe gebruiker</a>
+</div>

@@ -1,0 +1,41 @@
+﻿@{
+    ViewData["Title"] = "Login";
+}
+
+<h1>Login pagina</h1>
+
+<hr />
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-2">
+            <a class="btn btn-outline-dark btn-lg d-block" login-type=Username asp-action="LoginUserName">
+                @* <i class="fa-solid fa-user"></i>
+                <h4>Username</h4> *@
+            </a>
+        </div>
+        <div class="col-md-2">
+            <a class="btn btn-outline-dark btn-lg d-block" login-type=Email asp-action="LoginEmail">
+                @* <i class="fa-solid fa-at"></i>
+                <h4>Email</h4> *@
+            </a>
+        </div>
+        <div class="col-md-2 offset-2">
+            <a class="btn btn-outline-dark btn-lg d-block" login-type=Facebook asp-action="LoginFacebook">
+                @* <i class="fa-brands fa-facebook"></i>
+                <h4>Facebook</h4> *@
+            </a>
+        </div>
+        <div class="col-md-2">
+            <a class="btn btn-outline-dark btn-lg d-block" login-type=Google asp-action="LoginGoogle">
+                @*<i class="fa-brands fa-google"></i>
+                <h4>Google</h4> *@
+            </a>
+        </div>
+        <div class="col-md-2">
+            <a class="btn btn-outline-dark btn-lg d-block" login-type=External asp-action="LoginExternalProvider">
+                @* <i class="fa-solid fa-fingerprint"></i>
+                <h4>Ext. provider</h4> *@
+            </a>
+        </div>
+    </div>
+</div>
