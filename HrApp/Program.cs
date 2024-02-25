@@ -37,6 +37,6 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
-app.EnsureDbMigrated();
+EnsureDbMigrated(app);
 
 app.Run();
