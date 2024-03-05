@@ -7,36 +7,39 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using HrApp.Data;
 using HrApp.Models;
+using HrApp.Repositories;
 
 namespace HrApp.Controllers
 {
     public class EmployeeController : Controller
     {
-        private readonly AppDbContext _context;
+        private readonly IEmployeeRepository _employeeRepository;
 
-        public EmployeeController(AppDbContext context)
+        public EmployeeController(IEmployeeRepository repository)
         {
-            _context = context;
+            _employeeRepository = repository;
         }
 
         // GET: Employee
         public async Task<IActionResult> Index()
         {
-              return _context.Employees != null ? 
-                          View(await _context.Employees.ToListAsync()) :
-                          Problem("Entity set 'AppDbContext.Employee'  is null.");
+            var employees = await _employeeRepository.GetAll();
+            return View(employees);
+              //return _context.Employees != null ? 
+              //            View(await _context.Employees.ToListAsync()) :
+              //            Problem("Entity set 'AppDbContext.Employee'  is null.");
         }
 
         // GET: Employee/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null || _context.Employees == null)
+            if (id == null)
             {
-                return NotFound();
+                return BadRequest();
             }
 
-            var employee = await _context.Employees
-                .FirstOrDefaultAsync(m => m.EmployeeId == id);
+            var employee = await _employeeRepository.GetById(id);
+
             if (employee == null)
             {
                 return NotFound();
@@ -60,8 +63,8 @@ namespace HrApp.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.Add(employee);
-                await _context.SaveChangesAsync();
+                await _employeeRepository.Add(employee);
+
                 return RedirectToAction(nameof(Index));
             }
             return View(employee);
@@ -70,12 +73,13 @@ namespace HrApp.Controllers
         // GET: Employee/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null || _context.Employees == null)
+            if (id == null)
             {
-                return NotFound();
+                return BadRequest();
             }
 
-            var employee = await _context.Employees.FindAsync(id);
+            var employee = await _employeeRepository.GetById(id);
+
             if (employee == null)
             {
                 return NotFound();
@@ -92,27 +96,12 @@ namespace HrApp.Controllers
         {
             if (id != employee.EmployeeId)
             {
-                return NotFound();
+                return BadRequest();
             }
 
             if (ModelState.IsValid)
             {
-                try
-                {
-                    _context.Update(employee);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!EmployeeExists(employee.EmployeeId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
+                await _employeeRepository.Update(employee);
                 return RedirectToAction(nameof(Index));
             }
             return View(employee);
@@ -121,13 +110,13 @@ namespace HrApp.Controllers
         // GET: Employee/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null || _context.Employees == null)
+            if (id == null)
             {
-                return NotFound();
+                return BadRequest();
             }
 
-            var employee = await _context.Employees
-                .FirstOrDefaultAsync(m => m.EmployeeId == id);
+            var employee = await _employeeRepository.GetById(id);
+                
             if (employee == null)
             {
                 return NotFound();
@@ -141,23 +130,14 @@ namespace HrApp.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            if (_context.Employees == null)
-            {
-                return Problem("Entity set 'AppDbContext.Employee'  is null.");
-            }
-            var employee = await _context.Employees.FindAsync(id);
+            var employee = await _employeeRepository.GetById(id);
+            
             if (employee != null)
             {
-                _context.Employees.Remove(employee);
+                await _employeeRepository.Delete(employee);
             }
             
-            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
-        }
-
-        private bool EmployeeExists(int id)
-        {
-          return (_context.Employees?.Any(e => e.EmployeeId == id)).GetValueOrDefault();
         }
     }
 }

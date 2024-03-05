@@ -1,4 +1,5 @@
-﻿using HrApp.ViewModels;
+﻿using HrApp.Services;
+using HrApp.ViewModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
@@ -6,13 +7,11 @@ namespace HrApp.Controllers
 {
     public class AccountController : Controller
     {
-        private readonly UserManager<IdentityUser> _userManager;
-        private readonly SignInManager<IdentityUser> _signInManager;
+        private readonly IAuthenticationService _authenticationService;
 
-        public AccountController(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager)
+        public AccountController(IAuthenticationService authentication)
         {
-            _userManager = userManager;
-            _signInManager = signInManager;
+            _authenticationService = authentication;
         }
 
         #region Login
@@ -35,14 +34,17 @@ namespace HrApp.Controllers
         {
             if (ModelState.IsValid)
             {
-                var identityUser = await _userManager.FindByNameAsync(loginModel.UserName);
-                if (identityUser != null)
+                var result = await _authenticationService.SignInAsync(loginModel.UserName, null, loginModel.Password);
+                if (result.Succeeded)
                 {
-                    var result = await _signInManager.PasswordSignInAsync(identityUser, loginModel.Password, false, false);
-                    if (result.Succeeded)
-                    {
 
-                        return RedirectToAction("Index", "Home");
+                    return RedirectToAction("Index", "Home");
+                }
+                else
+                {
+                    foreach (var error in result.Errors)
+                    {
+                        ModelState.AddModelError("", error);
                     }
                 }
             }
@@ -65,14 +67,14 @@ namespace HrApp.Controllers
         {
             if (ModelState.IsValid)
             {
-                var identityUser = await _userManager.FindByEmailAsync(loginModel.Email);
-                if (identityUser != null)
+                var result = await _authenticationService.SignInAsync(null, loginModel.Email, loginModel.Password);
+                if (result.Succeeded)
                 {
-                    var result = await _signInManager.PasswordSignInAsync(identityUser, loginModel.Password, false, false);
-                    if (result.Succeeded)
-                    {
-                        return RedirectToAction("Index", "Home");
-                    }
+                    return RedirectToAction("Index", "Home");
+                }
+                else
+                {
+                    ModelState.AddModelError("", result.Errors!.FirstOrDefault());
                 }
             }
 
@@ -90,16 +92,17 @@ namespace HrApp.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> RegisterAsync(RegisterViewModel registerModel)
+        public async Task<IActionResult> RegisterAsync(RegisterViewModel registrationData)
         {
             if (ModelState.IsValid)
             {
                 var identityUser = new IdentityUser
                 {
-                    Email = registerModel.Email,
-                    UserName = registerModel.UserName
+                    Email = registrationData.Email,
+                    UserName = registrationData.UserName
                 };
-                var result = await _userManager.CreateAsync(identityUser, registerModel.Password);
+
+                var result = await _authenticationService.RegisterAsync(registrationData);
                 if (result.Succeeded)
                 {
                     return RedirectToAction("Login", "Account");
@@ -108,7 +111,7 @@ namespace HrApp.Controllers
                 {
                     foreach(var error in result.Errors)
                     {
-                        ModelState.AddModelError(error.Code, error.Description);
+                        ModelState.AddModelError("", error);
                     }
                 }
             }
@@ -121,9 +124,15 @@ namespace HrApp.Controllers
 
         public async Task<IActionResult> LogoutAsync()
         {
-            await _signInManager.SignOutAsync();
+            await _authenticationService.SignOutAsync();
             return RedirectToAction("Login", "Account");
         }
+
+        #endregion
+
+        #region Facebook
+
+
 
         #endregion
     }
